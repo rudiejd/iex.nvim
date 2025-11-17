@@ -15,13 +15,13 @@ local function get_or_create_term(bufnr, clean)
 end
 
 
-IexFunctions.toggle = function ()
+IexFunctions.toggle = function (opts)
   local bufnr = vim.api.nvim_get_current_buf()
   local iex_term = get_or_create_term(bufnr)
-  iex_term:toggle_iex()
+  iex_term:toggle_iex(opts)
 end
 
-IexFunctions.kill = function ()
+IexFunctions.kill = function (_)
   local bufnr = vim.api.nvim_get_current_buf()
   local iex_term = IexManager.terminals[bufnr]
   if iex_term == nil then
@@ -33,7 +33,7 @@ IexFunctions.kill = function ()
   IexManager.terminals[bufnr] = nil
 end
 
-IexFunctions.clean_start = function ()
+IexFunctions.clean_start = function (_)
   local bufnr = vim.api.nvim_get_current_buf()
   local iex_term = get_or_create_term(bufnr, true)
   iex_term:toggle_iex()
@@ -46,7 +46,6 @@ IexFunctions.send = function (text)
     print("Error: No IEx terminal associated with this buffer.")
     return
   end
-  print("Sending: " .. text)
   iex_term:send_command(text)
 end
 

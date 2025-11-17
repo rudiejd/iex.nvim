@@ -9,10 +9,10 @@ local IexFunctions = require("iex.builtin")
 
 M.setup = function ()
   vim.api.nvim_create_user_command("IEx", function(opts)
-    local command = opts.args
-    IexFunctions[command]()
+    local command = opts.fargs[1]
+    IexFunctions[command]({launch_args = vim.list_slice(opts.fargs, 2, #opts.fargs)})
   end, {
-    nargs = 1,
+    nargs = '*',
     complete = function (_, _)
       return vim.tbl_keys(IexFunctions)
     end
@@ -37,7 +37,6 @@ M.setup = function ()
 
     vim.fn.setreg('v', old_v, old_v_type)
 
-    print("Sending text: " .. text)
     IexFunctions.send(text)
   end, { silent = true })
 end

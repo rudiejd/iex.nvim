@@ -19,7 +19,7 @@ function IexTerm:new(bufnr)
   }, self)
 end
 
---- @class CreateRightWindowOpts
+--- @type CreateRightWindowOpts 
 --- Creates a new window and buffer for the terminal.
 --- @param opts CreateRightWindowOpts
 --- @field buf integer - Buffer handler for the editing code editor buffer.
@@ -48,16 +48,27 @@ function IexTerm:create_right_window(opts)
   return self.window
 end
 
+---@class ToggleOpts
+---@field launch_args string[] Arguments with which IEx should be launched
 --- Opens or closes the IEx terminal. Creates a terminal if it does not exists.
-function IexTerm:toggle_iex()
+--- @param opts ToggleOpts
+function IexTerm:toggle_iex(opts)
+  opts = opts or {}
+
   if vim.api.nvim_win_is_valid(self.window.win) then
     vim.api.nvim_win_hide(self.window.win)
     return
   end
   local curr_win = vim.api.nvim_get_current_win()
   self.window = self:create_right_window({ buf = self.window.buf })
+
+  local launch_cmd = {"iex"} 
+  
+  launch_args = opts.launch_args or {}
+  launch_cmd = vim.list_extend(launch_cmd, launch_args)
+
   if vim.bo[self.window.buf].buftype ~= "terminal" then
-    self.channel_id = vim.fn.termopen("iex", {
+    self.channel_id = vim.fn.termopen(launch_cmd, {
       on_exit = function()
         self.channel_id = 0 -- Reset channel_id when terminal exits
       end,
